@@ -17,7 +17,7 @@ A full-stack application that allows users to organize, list, and manage their p
 - Type-safe APIs and data handling (tRPC, Prisma).
 - Client-side data caching (TanStackt Query).
 
-# Project Structure
+## Project Structure
 ├── /src
 │   ├── /pages        # Next.js pages
 │   ├── /server       # tRPC routers and backend logic
