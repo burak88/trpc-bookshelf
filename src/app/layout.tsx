@@ -20,7 +20,7 @@ export default async function RootLayout({
   const session = await auth();
 
   if (!session) {
-    redirect("/login");
+    redirect("/api/auth/signin");
   }
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
