@@ -18,6 +18,7 @@ A full-stack application that allows users to organize, list, and manage their p
 - Client-side data caching (TanStackt Query).
 
 ## Project Structure
+```
 ├── /src
 │   ├── /pages        # Next.js pages
 │   ├── /server       # tRPC routers and backend logic
@@ -28,7 +29,7 @@ A full-stack application that allows users to organize, list, and manage their p
 │   └── schema.prisma # Prisma schema
 ├── .env              # Environment variables
 └── README.md         # Project documentation
-
+```
 ## Installation
 
 Follow these steps to run the project locally:
