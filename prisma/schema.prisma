@@ -7,30 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
-}
-
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? 
-  access_token             String? 
+  refresh_token            String?
+  access_token             String?
   expires_at               Int?
   token_type               String?
   scope                    String?
-  id_token                 String? 
+  id_token                 String?
   session_state            String?
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   refresh_token_expires_in Int?
@@ -47,15 +35,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String      @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  posts         Post[]
   bookshelves   Bookshelf[]
+  authors       Author[]
+  books         Book[]
 }
 
 model VerificationToken {
@@ -67,38 +56,44 @@ model VerificationToken {
 }
 
 model Bookshelf {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   name      String
-  userId    String   // Düzeltilmiş tür
+  userId    String // Düzeltilmiş tür
   createdAt DateTime @default(now())
 
-  user  User   @relation(fields: [userId], references: [id])
+  user  User              @relation(fields: [userId], references: [id])
   books BookOnBookshelf[]
 }
 
 model Author {
-  id   Int    @id @default(autoincrement())
-  name String
+  id     String @id @default(uuid())
+  name   String
+  userId String
+  books  Book[]
 
-  books Book[]
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Book {
-  id        Int    @id @default(autoincrement())
+  id        String   @id @default(uuid())
   title     String
-  authorId  Int
+  authorId  String
+  userId    String
   createdAt DateTime @default(now())
 
-  author Author @relation(fields: [authorId], references: [id])
+  author      Author            @relation(fields: [authorId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
   bookshelves BookOnBookshelf[]
 }
 
 model BookOnBookshelf {
-  id           Int      @id @default(autoincrement())
-  bookshelfId  Int
-  bookId       Int
-  addedAt      DateTime @default(now())
+  id          String   @id @default(uuid())
+  bookshelfId String
+  bookId      String
+  addedAt     DateTime @default(now())
 
   bookshelf Bookshelf @relation(fields: [bookshelfId], references: [id])
   book      Book      @relation(fields: [bookId], references: [id])
+
+  @@unique([bookshelfId, bookId])
 }
