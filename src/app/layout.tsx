@@ -7,6 +7,8 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { NextAuthProvider } from "./provider";
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/ui/app-sidebar";
 
 export const metadata: Metadata = {
   title: "My Bookshelf",
@@ -26,7 +28,13 @@ export default async function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <NextAuthProvider>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarTrigger />
+              <main className="p-10">{children}</main>
+            </SidebarProvider>
+          </TRPCReactProvider>
         </NextAuthProvider>
       </body>
     </html>
