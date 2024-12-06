@@ -15,7 +15,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { api } from "@/trpc/react";
+import {
+  useBookShelfs,
+  useCreateBookShelf,
+  useDeleteBookShelf,
+} from "../queries/bookshelf";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Pencil, Trash2 } from "lucide-react";
+import { formatTimestamp } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -30,26 +46,30 @@ export default function BookShelfPage() {
       name: "",
     },
   });
-  
-  const createBookshelfMutation  = api.bookShelf.create.useMutation({
-    onSuccess: (data ) => {
-      console.log("Bookshelf created:", data);
-      alert("Bookshelf created successfully!");
-    },
-    onError: (error) => {
-      console.error("Error creating bookshelf:", error.message);
-      alert("Failed to create bookshelf.");
-    },
-  });
+
+  const createBookshelfMutation = useCreateBookShelf();
+  const allBookshelf = useBookShelfs();
+  const deleteBookshelf = useDeleteBookShelf();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    createBookshelfMutation.mutate(values)
+    createBookshelfMutation.mutate(values);
     form.resetField("name");
-    console.log(values);
   }
+
+  const handleDeleteShelf = async (shelfId: string) => {
+    deleteBookshelf.mutate({ bookShelfId: shelfId });
+  };
+
   return (
-    <div>
+    <div className="grid grid-cols-6 gap-4">
+      {createBookshelfMutation.isPending ||
+        deleteBookshelf.isIdle ||
+        (allBookshelf.isLoading && <Spinner />)}
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="col-start-1 col-end-3 space-y-8"
+        >
           <FormField
             control={form.control}
             name="name"
@@ -57,7 +77,7 @@ export default function BookShelfPage() {
               <FormItem>
                 <FormLabel>Bookshelf Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input placeholder="first_bookshelf" {...field} />
                 </FormControl>
                 <FormDescription>
                   This is your private bookshelf name.
@@ -69,6 +89,34 @@ export default function BookShelfPage() {
           <Button type="submit">Submit</Button>
         </form>
       </FormProvider>
+      <div className="col-span-3 col-end-7">
+        <Table className="border-2">
+          <TableCaption>A list of your all bookshelf.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[200px]">Book Shelf Name</TableHead>
+              <TableHead className="w-[200px]">Created At</TableHead>
+              <TableHead className="w-[200px]">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {allBookshelf.data?.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell className="font-medium">{row.name}</TableCell>
+                <TableCell>{formatTimestamp(row.createdAt)}</TableCell>
+                <TableCell className="flex gap-4">
+                  <Pencil size={18} className="text-green-400" />
+                  <Trash2
+                    size={18}
+                    className="cursor-pointer text-red-400"
+                    onClick={() => handleDeleteShelf(row.id)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

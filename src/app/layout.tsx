@@ -9,7 +9,8 @@ import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
-
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 export const metadata: Metadata = {
   title: "My Bookshelf",
   description: "My Bookshelf",
@@ -32,7 +33,10 @@ export default async function RootLayout({
             <SidebarProvider>
               <AppSidebar />
               <SidebarTrigger />
-              <main className="p-10">{children}</main>
+              <main className="p-10">
+                <ToastContainer />
+                {children}
+              </main>
             </SidebarProvider>
           </TRPCReactProvider>
         </NextAuthProvider>
