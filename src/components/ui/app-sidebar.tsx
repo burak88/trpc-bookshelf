@@ -1,4 +1,4 @@
-import { Book,Home, LibraryBig, Settings, UserPen } from "lucide-react"
+import { Book,Home, LibraryBig, LogOut, Settings, UserPen } from "lucide-react"
 
 import {
   Sidebar,
@@ -25,12 +25,12 @@ const items = [
   },
   {
     title: "Author",
-    url: "#",
+    url: "author",
     icon: UserPen,
   },
   {
     title: "Book",
-    url: "#",
+    url: "book",
     icon: Book,
   },
   {
@@ -38,6 +38,11 @@ const items = [
     url: "#",
     icon: Settings,
   },
+  {
+    title : "Sign Out",
+    url : "/api/auth/signout",
+    icon : LogOut,
+  }
 ]
 
 export function AppSidebar() {

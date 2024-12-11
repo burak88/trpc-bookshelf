@@ -25,6 +25,22 @@ export const authorRouter = createTRPCRouter({
       return existingAuthor;
     }),
 
+  // get authors by userId
+  getByUserId: protectedProcedure.query(async ({ ctx }) => {
+    const existingAuthors = await ctx.db.author.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+    });
+    if (!existingAuthors) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "No author found for the current user",
+      });
+    }
+    return existingAuthors;
+  }),
+
   // create author
   create: protectedProcedure
     .input(

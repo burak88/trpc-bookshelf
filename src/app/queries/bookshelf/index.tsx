@@ -12,7 +12,6 @@ export const useCreateBookShelf = () => {
   const queryClient = useQueryClient();
   const mutation = api.bookShelf.create.useMutation({
     onSuccess: (data) => {
-      console.log(queryClient.getQueryCache());
       queryClient.invalidateQueries({
         queryKey: [["bookShelf", "getByUserId"], { type: "query" }],
       });
@@ -36,6 +35,22 @@ export const useDeleteBookShelf = () => {
     },
     onError: (error) => {
       toast.error(`Failed to delete bookshelf., ${error.message}`);
+    },
+  });
+  return mutation;
+};
+
+export const useUpdateBookShelf = () => {
+  const queryClient = useQueryClient();
+  const mutation = api.bookShelf.update.useMutation({
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [["bookShelf", "getByUserId"], { type: "query" }],
+      });
+      toast.success(`Bookshelf updated:, ${data.name}`);
+    },
+    onError: (error) => {
+      toast.error(`Failed to update bookshelf., ${error.message}`);
     },
   });
   return mutation;

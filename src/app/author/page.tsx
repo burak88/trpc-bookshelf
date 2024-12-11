@@ -1,10 +1,15 @@
 "use client";
 
 import React from "react";
-import { FormProvider } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import {
+  useAuthors,
+  useCreateAuthor,
+  useDeleteAuthor,
+  useUpdateAuthor,
+} from "../queries/author";
 import { z } from "zod";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FormControl,
   FormDescription,
@@ -15,12 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  useBookShelfs,
-  useCreateBookShelf,
-  useDeleteBookShelf,
-  useUpdateBookShelf,
-} from "../queries/bookshelf";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -30,53 +30,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2 } from "lucide-react";
-import { formatTimestamp } from "@/lib/utils";
-import { Spinner } from "@/components/ui/spinner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@radix-ui/react-popover";
-import { Label } from "@radix-ui/react-label";
-
+} from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 1 characters.",
   }),
 });
 
-export default function BookShelfPage() {
+export default function AuthorPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
     },
   });
-
-  const createBookshelfMutation = useCreateBookShelf();
-  const allBookshelf = useBookShelfs();
-  const deleteBookshelf = useDeleteBookShelf();
-  const updateBookshelf = useUpdateBookShelf();
+  const author = useAuthors();
+  const createAuthorMutation = useCreateAuthor();
+  const updateAuthorMutation = useUpdateAuthor();
+  const deleteAuthorMutation = useDeleteAuthor();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    createBookshelfMutation.mutate(values);
+    createAuthorMutation.mutate(values);
     form.resetField("name");
   }
 
-  const handleDeleteShelf = async (shelfId: string) => {
-    deleteBookshelf.mutate({ bookShelfId: shelfId });
+  const handleUpdateAuthor = (id: string, name: string) => {
+    updateAuthorMutation.mutate({ authorId: id, name: name });
   };
 
-  const handleUpdateShelf = async (shelfId: string, name: string) => {
-    updateBookshelf.mutate({ bookShelfId: shelfId, name: name });
-  };
+  const handleDeleteAuthor = (id : string) => {
+    deleteAuthorMutation.mutate({authorId : id})
+  }
 
   return (
     <div className="grid grid-cols-6 gap-4">
-      {createBookshelfMutation.isPending ||
-        deleteBookshelf.isIdle ||
-        (allBookshelf.isLoading && <Spinner />)}
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -87,13 +79,11 @@ export default function BookShelfPage() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bookshelf Name</FormLabel>
+                <FormLabel>Author Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="first_bookshelf" {...field} />
+                  <Input placeholder="author name" {...field} />
                 </FormControl>
-                <FormDescription>
-                  This is your private bookshelf name.
-                </FormDescription>
+                <FormDescription>This is your authors name.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -103,19 +93,17 @@ export default function BookShelfPage() {
       </FormProvider>
       <div className="col-span-3 col-end-7">
         <Table className="border-2">
-          <TableCaption>A list of your all bookshelf.</TableCaption>
+          <TableCaption>A list of your all author.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[200px]">Book Shelf Name</TableHead>
-              <TableHead className="w-[200px]">Created At</TableHead>
+              <TableHead className="w-[200px]">Author Name</TableHead>
               <TableHead className="w-[200px]">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allBookshelf.data?.map((row) => (
+            {author.data?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell className="font-medium">{row.name}</TableCell>
-                <TableCell>{formatTimestamp(row.createdAt)}</TableCell>
                 <TableCell className="flex gap-4">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -128,10 +116,10 @@ export default function BookShelfPage() {
                       <div className="grid gap-4">
                         <div className="space-y-2">
                           <h4 className="font-medium leading-none">
-                            Edit Bookshelf
+                            Edit Author Name
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            Update the bookshelf details below.
+                            Update the author details below.
                           </p>
                         </div>
                         <div className="grid gap-2">
@@ -141,12 +129,12 @@ export default function BookShelfPage() {
                               id="name"
                               defaultValue={row.name}
                               className="col-span-2 h-8"
-                              onChange={(e) => (row.name = e.target.value)} // Değeri geçici olarak tut
+                              onChange={(e) => (row.name = e.target.value)}
                             />
                           </div>
                         </div>
                         <Button
-                          onClick={() => handleUpdateShelf(row.id, row.name)}
+                           onClick={() => handleUpdateAuthor(row.id, row.name)}
                           className="w-full"
                         >
                           Save
@@ -157,7 +145,7 @@ export default function BookShelfPage() {
                   <Trash2
                     size={18}
                     className="cursor-pointer text-red-400"
-                    onClick={() => handleDeleteShelf(row.id)}
+                    onClick={() => handleDeleteAuthor(row.id)}
                   />
                 </TableCell>
               </TableRow>
