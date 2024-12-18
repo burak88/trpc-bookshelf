@@ -143,7 +143,7 @@ export default function BookPage() {
           <Button type="submit">Submit</Button>
         </form>
       </FormProvider>
-      <div className="col-span-3 col-end-7">
+      <div className="col-span-3 col-end-7 p-4">
         <Table className="border-2">
           <TableCaption>A list of your all book.</TableCaption>
           <TableHeader>
